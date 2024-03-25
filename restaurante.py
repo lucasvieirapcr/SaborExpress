@@ -1,3 +1,5 @@
+from modelos.avaliacao import Avaliacao
+
 class Restaurante:
     restaurantes = []
 
@@ -6,6 +8,7 @@ class Restaurante:
         self._nome = nome.title()    #primeira letra maiuscula
         self._categoria = categoria
         self._ativo = False                    #atributo privado. Não esperamos que as pessoas alterem o valor dele.
+        self._avaliacao = []                #criando uma lista para as avaliações
         Restaurante.restaurantes.append(self)   #TODA VEZ QUE EU CRIAR UM RESTAURANTE ELE ADICIONA NA LISTA
     
     #METODO ESPECIAIS
@@ -16,10 +19,10 @@ class Restaurante:
     #METODO ESPECIFICO
     @classmethod        #metodo da classe
     def listar_restaurantes(cls):       #cls, para indicar que se trata de um método da classe
-        print(f'{'\nNome do restaurante'.ljust(25)} | {'Categoria'.ljust(25)} | {'Status'}')
+        print(f'{'\nNome do restaurante'.ljust(25)} | {'Categoria'.ljust(25)} | {'Avaliações'.ljust(25)} |{'Status'}')
         print('---------------------------------------------------------------')
         for restaurante in cls.restaurantes:
-            print(f'{restaurante._nome.ljust(25)} | {restaurante._categoria.ljust(25)} | {restaurante.ativo}')
+            print(f'{restaurante._nome.ljust(25)} | {restaurante._categoria.ljust(25)} | {restaurante.media_avaliacoes.ljust(25)} | {restaurante.ativo}')
     
     
     @property       #modificando o jeito do atributo ser lido
@@ -30,9 +33,19 @@ class Restaurante:
     def alternar_estado(self):
         self._ativo = not self._ativo
 
-coco_bambu = Restaurante("coco Bambu", "Jantar")
-coco_bambu.alternar_estado()
-pizza_rei = Restaurante("pizzaria Pedra do Rei", "Pizzaria")
-restaurante_praca = Restaurante("coma Buen", "Italiana")
+    
+    def receber_avaliacao(self, cliente, nota):
+        if 0 < nota <= 5: 
+            avaliacao = Avaliacao(cliente, nota)
+            self._avaliacao.append(avaliacao)
 
-Restaurante.listar_restaurantes()
+    
+
+    @property
+    def media_avaliacoes(self):
+        if not self.avaliacao:
+            return '-'
+        soma_das_notas = sum(avaliacao._nota for avaliacao in self._avaliacao)      #para cada avaliacao, soma as notas
+        quantidade_de_notas = len(self._avaliacao)      #pegando quantidade de notas
+        media = (soma_das_notas / quantidade_de_notas, 1)   #fazendo a media e deixando uma casa decimal
+        return media
